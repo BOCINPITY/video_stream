@@ -1,27 +1,53 @@
 <template>
+  <h1>餐厅智能自助结算系统</h1>
   <div class="container">
     <div class="left">
-      <div class="banner"></div>
+      <div class="banner">
+        <el-carousel
+          :height="bannerHeight"
+          direction="vertical"
+          motion-blur
+          :autoplay="false"
+        >
+          <el-carousel-item v-for="item in 4" :key="item">
+            <h3 text="2xl" justify="center">{{ item }}</h3>
+          </el-carousel-item>
+        </el-carousel>
+      </div>
       <div class="divid"></div>
       <div class="order">
-        <table>
-          <thead>
-            <tr>
-              <th>识别图片</th>
-              <th>菜名</th>
-              <th>单价</th>
-              <th>价格</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><img src="../assets/th.jpeg" alt="红烧狮子头" /></td>
-              <td>红烧狮子头</td>
-              <td>￥18</td>
-              <td>￥18</td>
-            </tr>
-          </tbody>
-        </table>
+        <el-table :data="tableData" style="width: 100%">
+          <el-table-column prop="image" label="识别图片" width="180">
+            <template #default="scope">
+              <img
+                :style="{ height: 100 + 'px', borderRadius: 16 + 'px' }"
+                :src="scope.row.image"
+                alt="dish"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column prop="dishName" label="菜名" width="180">
+            <template #default="scope">
+              <div>
+                {{ scope.row.dishName }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="siglePrice" label="单价">
+            <template #default="scope">
+              <div>
+                {{ scope.row.siglePrice + "￥" }}
+              </div>
+            </template></el-table-column
+          >
+          <el-table-column prop="price" label="价格">
+            <template #default="scope">
+              <div>
+                {{ scope.row.price + "￥" }}
+              </div>
+            </template></el-table-column
+          >
+        </el-table>
       </div>
     </div>
     <div class="right">
@@ -34,7 +60,7 @@
       <div class="total">总记<span>￥52</span></div>
       <div class="footer">
         <div class="order_status">支付状态<span>未支付</span></div>
-        <div class="exit">退出</div>
+        <div class="exit" @click="exit">退出</div>
       </div>
     </div>
   </div>
@@ -47,6 +73,10 @@ const videoElement = ref<HTMLVideoElement>();
 const start = ref<HTMLButtonElement>();
 let pc: any = null;
 let videoStream = null;
+const exit = () => {
+  console.log("exit");
+};
+const bannerHeight = "600px";
 const publish = async () => {
   if (pc !== null && pc !== undefined) {
     console.log("已开始推流");
@@ -125,6 +155,57 @@ const publish = async () => {
       }
     });
 };
+const tableData = [
+  {
+    image:
+      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
+    dishName: "红烧肉",
+    siglePrice: "16",
+    price: "16",
+  },
+  {
+    image:
+      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
+    dishName: "红烧肉",
+    siglePrice: "16",
+    price: "16",
+  },
+  {
+    image:
+      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
+    dishName: "红烧肉",
+    siglePrice: "16",
+    price: "16",
+  },
+  {
+    image:
+      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
+    dishName: "红烧肉",
+    siglePrice: "16",
+    price: "16",
+  },
+  {
+    image:
+      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
+    dishName: "红烧肉",
+    siglePrice: "16",
+    price: "16",
+  },
+  {
+    image:
+      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
+    dishName: "红烧肉",
+    siglePrice: "16",
+    price: "16",
+  },
+  {
+    image:
+      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
+    dishName: "红烧肉",
+    siglePrice: "16",
+    price: "16",
+  },
+];
 const httpApi = async (url: string, data: any) => {
   try {
     const response = await fetch(url, {
@@ -146,86 +227,93 @@ const httpApi = async (url: string, data: any) => {
 </script>
 
 <style scoped>
+h1 {
+  text-align: center;
+  letter-spacing: 2rem;
+  -webkit-text-stroke: 1px var(--color-dark);
+  -webkit-text-fill-color: transparent;
+  font-weight: bolder;
+
+}
 .container {
   display: flex;
   justify-content: center;
+  font-size: var(--font-size-mid);
 }
-
 .left {
+  height: 70vh;
+  overflow-y: scroll;
   margin: 20px;
   padding: 20px;
   flex: 1;
-
-  border: 2px black solid;
+  border-radius: var(--border-radius-sm);
+  border: 2px var(--color-bg) solid;
   display: flex;
   .banner {
     border-radius: 8px;
-    background-color: #ccc;
     flex: 0.4;
+    .el-carousel__item h3 {
+      color: #475669;
+      opacity: 0.75;
+      line-height: v-bind(bannerHeight);
+      margin: 0;
+      text-align: center;
+    }
+
+    .el-carousel__item:nth-child(2n) {
+      background-color: var(--color-primary);
+    }
+    .el-carousel__item:nth-child(2n + 1) {
+      background-color: var(--color-dark);
+    }
   }
   .divid {
     width: 20px;
   }
   .order {
     flex: 0.6;
-    display: flex;
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      border: 1px solid #ccc;
-      letter-spacing: 1px;
-      th,
-      td {
-        img {
-          width: 200px;
-          height: 145px;
-        }
-        text-align: center;
-        border: 1px solid rgb(160 160 160);
-        padding: 20px;
-      }
-    }
   }
 }
 .right {
+  border-radius: var(--border-radius-sm);
+  border: 2px var(--color-bg) solid;
   margin: 20px;
   padding: 20px;
   width: 30vw;
   display: flex;
   flex-direction: column;
-  color: white;
+  justify-content: space-between;
+  color: var(--color-font-light);
   .usercard {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: black;
-
+    background-color: var(--color-dark);
     padding: 10px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-mid);
     video {
       object-fit: cover;
       width: 150px;
       height: 150px;
-      border-radius: 50%;
-      background-color: #fff;
+      border-radius: var(--border-radius-round);
+      background-color: var(--color-bg);
     }
   }
   .total {
-    background-color: #000;
+    box-shadow: 10px 10px 50px -7px var(--color-dark);
+    background-color: var(--color-dark);
     height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-top: 20px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-mid);
     span {
       font-size: 24px;
     }
   }
   .footer {
-    margin-top: 20px;
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -234,11 +322,12 @@ const httpApi = async (url: string, data: any) => {
     font-weight: bold;
     font-size: 24px;
     .order_status {
-      background-color: #000;
+      box-shadow: 10px 10px 50px -7px var(--color-dark);
+      background-color: var(--color-dark);
       height: 100%;
       margin-right: 10px;
       width: 100%;
-      border-radius: 8px;
+      border-radius: var(--border-radius-mid);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -251,13 +340,19 @@ const httpApi = async (url: string, data: any) => {
       }
     }
     .exit {
-      background-color: #000;
+      box-shadow: 10px 10px 50px -7px var(--color-dark);
+      cursor: pointer;
+      background-color: var(--color-dark);
       height: 100%;
       width: 100%;
-      border-radius: 8px;
+      border-radius: var(--border-radius-mid);
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+    .exit:hover {
+      background-color: var(--color-primary);
+      transition: background-color 0.3s;
     }
   }
 }
