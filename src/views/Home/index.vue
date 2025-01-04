@@ -1,74 +1,46 @@
 <template>
-  <h1>餐厅智能自助结算系统</h1>
-  <div class="container">
-    <div class="left">
-      <div class="banner">
-        <el-carousel
-          :height="bannerHeight"
-          direction="vertical"
-          motion-blur
-          :autoplay="false"
-        >
-          <el-carousel-item v-for="item in 4" :key="item">
-            <h3 text="2xl" justify="center">{{ item }}</h3>
-          </el-carousel-item>
-        </el-carousel>
+  <div class="box">
+    <h1>餐厅智能自助结算系统</h1>
+    <div class="container">
+      <div class="left">
+        <div class="banner">
+          <Banner />
+        </div>
+        <div class="divid"></div>
+        <div class="order">
+          <DishTable />
+        </div>
       </div>
-      <div class="divid"></div>
-      <div class="order">
-        <el-table :data="tableData" style="width: 100%">
-          <el-table-column prop="image" label="识别图片" width="180">
-            <template #default="scope">
-              <img
-                :style="{ height: 100 + 'px', borderRadius: 16 + 'px' }"
-                :src="scope.row.image"
-                alt="dish"
-              />
-            </template>
-          </el-table-column>
-          <el-table-column prop="dishName" label="菜名" width="180">
-            <template #default="scope">
-              <div>
-                {{ scope.row.dishName }}
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="siglePrice" label="单价">
-            <template #default="scope">
-              <div>
-                {{ scope.row.siglePrice + "￥" }}
-              </div>
-            </template></el-table-column
-          >
-          <el-table-column prop="price" label="价格">
-            <template #default="scope">
-              <div>
-                {{ scope.row.price + "￥" }}
-              </div>
-            </template></el-table-column
-          >
-        </el-table>
-      </div>
-    </div>
-    <div class="right">
-      <div class="usercard">
-        <video ref="videoElement" autoplay></video>
-        <div class="username">李华</div>
-        <div class="phone">电话:17376477593</div>
-        <div class="rest">余额:￥2000</div>
-      </div>
-      <div class="total">总记<span>￥52</span></div>
-      <div class="footer">
-        <div class="order_status">支付状态<span>未支付</span></div>
-        <div class="exit" @click="exit">退出</div>
+      <div class="right">
+        <div class="usercard">
+          <video ref="videoElement" autoplay></video>
+          <div class="info">
+            <div class="username">
+              <el-icon><User /></el-icon>李华
+            </div>
+            <div class="phone">
+              <el-icon><Phone /></el-icon>电话:173****7593
+            </div>
+            <div class="rest">
+              <el-icon><Wallet /></el-icon>余额:￥2000
+            </div>
+          </div>
+        </div>
+        <div class="total">总记<span>￥52</span></div>
+        <div class="footer">
+          <div class="order_status">支付状态<span>未支付</span></div>
+          <div class="exit" @click="exit">退出</div>
+        </div>
       </div>
     </div>
   </div>
-  <button ref="start" @click="publish">开始推流</button>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import DishTable from "./DishTable.vue";
+import Banner from "./Banner.vue";
+import { Phone, User, Wallet } from "@element-plus/icons-vue";
 const videoElement = ref<HTMLVideoElement>();
 const start = ref<HTMLButtonElement>();
 let pc: any = null;
@@ -76,7 +48,7 @@ let videoStream = null;
 const exit = () => {
   console.log("exit");
 };
-const bannerHeight = "600px";
+
 const publish = async () => {
   if (pc !== null && pc !== undefined) {
     console.log("已开始推流");
@@ -155,57 +127,7 @@ const publish = async () => {
       }
     });
 };
-const tableData = [
-  {
-    image:
-      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
-    dishName: "红烧肉",
-    siglePrice: "16",
-    price: "16",
-  },
-  {
-    image:
-      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
-    dishName: "红烧肉",
-    siglePrice: "16",
-    price: "16",
-  },
-  {
-    image:
-      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
-    dishName: "红烧肉",
-    siglePrice: "16",
-    price: "16",
-  },
-  {
-    image:
-      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
-    dishName: "红烧肉",
-    siglePrice: "16",
-    price: "16",
-  },
-  {
-    image:
-      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
-    dishName: "红烧肉",
-    siglePrice: "16",
-    price: "16",
-  },
-  {
-    image:
-      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
-    dishName: "红烧肉",
-    siglePrice: "16",
-    price: "16",
-  },
-  {
-    image:
-      "https://cdn.pixabay.com/photo/2014/11/05/15/57/new-years-eve-518032_1280.jpg",
-    dishName: "红烧肉",
-    siglePrice: "16",
-    price: "16",
-  },
-];
+
 const httpApi = async (url: string, data: any) => {
   try {
     const response = await fetch(url, {
@@ -224,16 +146,45 @@ const httpApi = async (url: string, data: any) => {
     return null;
   }
 };
+interface ISentence {
+  commit_from: string;
+  created_at: string;
+  creator: string;
+  creator_uid: number;
+  from: string;
+  from_who: string;
+  hitokoto: string;
+  id: number;
+  length: number;
+  reviewer: number;
+  type: string;
+  uuid: string;
+}
+onMounted(() => {
+  publish();
+});
 </script>
 
 <style scoped>
 h1 {
   text-align: center;
   letter-spacing: 2rem;
-  -webkit-text-stroke: 1px var(--color-dark);
+  -webkit-text-stroke: 1px var(--color-font-dark);
   -webkit-text-fill-color: transparent;
-  font-weight: bolder;
-
+  font-weight: bold;
+  font-size: 42px;
+}
+.sentence {
+  text-align: center;
+  color: #bbb;
+  font-family: "宋体";
+}
+.box {
+  background-image: url("../../assets/bg/bg01.png"),
+    url("../../assets/bg/bg02.png");
+  background-size: 300px, 500px;
+  background-position: left bottom, right 0;
+  background-repeat: no-repeat;
 }
 .container {
   display: flex;
@@ -241,31 +192,19 @@ h1 {
   font-size: var(--font-size-mid);
 }
 .left {
+  box-shadow: 10px 10px 50px -7px var(--color-dark);
   height: 70vh;
+  min-width: 600px;
   overflow-y: scroll;
   margin: 20px;
   padding: 20px;
   flex: 1;
   border-radius: var(--border-radius-sm);
-  border: 2px var(--color-bg) solid;
+  border: 2px var(--color-dark) solid;
   display: flex;
   .banner {
     border-radius: 8px;
     flex: 0.4;
-    .el-carousel__item h3 {
-      color: #475669;
-      opacity: 0.75;
-      line-height: v-bind(bannerHeight);
-      margin: 0;
-      text-align: center;
-    }
-
-    .el-carousel__item:nth-child(2n) {
-      background-color: var(--color-primary);
-    }
-    .el-carousel__item:nth-child(2n + 1) {
-      background-color: var(--color-dark);
-    }
   }
   .divid {
     width: 20px;
@@ -276,10 +215,13 @@ h1 {
 }
 .right {
   border-radius: var(--border-radius-sm);
-  border: 2px var(--color-bg) solid;
+  box-shadow: 10px 10px 50px -7px var(--color-dark);
+  border: 2px var(--color-dark) solid;
   margin: 20px;
   padding: 20px;
   width: 30vw;
+  min-height: 500px;
+  min-width:250px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -289,7 +231,7 @@ h1 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: var(--color-dark);
+    background-color: var(--color-bg-7);
     padding: 10px;
     border-radius: var(--border-radius-mid);
     video {
@@ -299,10 +241,22 @@ h1 {
       border-radius: var(--border-radius-round);
       background-color: var(--color-bg);
     }
+    .info {
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-top: 32px;
+      flex-wrap: wrap;
+      .rest {
+        display: flex;
+        align-items: center;
+      }
+    }
   }
   .total {
     box-shadow: 10px 10px 50px -7px var(--color-dark);
-    background-color: var(--color-dark);
+    background-color: var(--color-bg-7);
     height: 120px;
     display: flex;
     flex-direction: column;
@@ -323,7 +277,7 @@ h1 {
     font-size: 24px;
     .order_status {
       box-shadow: 10px 10px 50px -7px var(--color-dark);
-      background-color: var(--color-dark);
+      background-color: var(--color-bg-7);
       height: 100%;
       margin-right: 10px;
       width: 100%;
@@ -342,7 +296,7 @@ h1 {
     .exit {
       box-shadow: 10px 10px 50px -7px var(--color-dark);
       cursor: pointer;
-      background-color: var(--color-dark);
+      background-color: var(--color-bg-7);
       height: 100%;
       width: 100%;
       border-radius: var(--border-radius-mid);
