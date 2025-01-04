@@ -52,9 +52,10 @@ const publish = async () => {
     console.log("已开始推流");
     return;
   }
-
-  const httpURL = "http://localhost:1985/rtc/v1/publish/";
-  const webRTCURL = "webRTC://localhost/live/1";
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    console.error("浏览器不支持 getUserMedia");
+    return;
+  }
   const constraints = {
     audio: {
       echoCancellation: true, // 回声消除
@@ -65,9 +66,20 @@ const publish = async () => {
       frameRate: { min: 30 }, // 最小帧率
       width: { min: 640, ideal: 1080 }, // 宽度
       height: { min: 360, ideal: 720 }, // 高度
-      aspectRadio: 16 / 9, // 宽高比
+      aspectRatio: 16 / 9, // 宽高比
     },
   };
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    videoElement.value!.srcObject = stream;
+    videoStream = stream;
+    // ...existing code...
+  } catch (error) {
+    console.error("获取媒体流失败", error);
+  }
+  const httpURL = "http://localhost:1985/rtc/v1/publish/";
+  const webRTCURL = "webRTC://localhost/live/livestream";
+
   // 通过摄像头、麦克风获取音视频流
   videoStream = await navigator.mediaDevices.getUserMedia(constraints);
   //video播放流数据
