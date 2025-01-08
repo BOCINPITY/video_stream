@@ -11,12 +11,19 @@
 </template>
 
 <script lang="ts" setup>
-import { Check, Wallet, WarnTriangleFilled } from "@element-plus/icons-vue";
+import { Check } from "@element-plus/icons-vue";
 import { ref } from "vue";
+import { useRoute,useRouter } from 'vue-router';
+const router = useRouter();
 
-const orderId = ref("1234567890");
-const paymentAmount = ref(120);
+const route = useRoute();
+const receivedData = route.query;
+const orderId = Date.now();
+const paymentAmount = ref(receivedData.total);
 const paymentTime = ref(new Date());
+setTimeout(() => {
+  router.go(-1);
+}, 3000);
 </script>
 
 <style scoped>

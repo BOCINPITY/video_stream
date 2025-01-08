@@ -1,35 +1,38 @@
 <template>
   <div class="box">
     <h1>餐厅智能自助结算系统</h1>
-    <div class="container">
+    <div class="container" v-loading="flag" :element-loading-text="promtText">
       <div class="left">
         <div class="banner">
           <Banner />
         </div>
         <div class="divid"></div>
         <div class="order">
-          <DishTable />
+          <DishTable v-model:total="total" />
         </div>
       </div>
-      <div class="right">
+      <div class="right" v-loading="paySpin" :element-loading-text="promtText">
         <div class="usercard">
           <video ref="videoElement" autoplay></video>
-          <div class="info">
-            <div class="username">
-              <el-icon><User /></el-icon>李华
-            </div>
-            <div class="phone">
-              <el-icon><Phone /></el-icon>电话:173****7593
-            </div>
-            <div class="rest">
-              <el-icon><Wallet /></el-icon>余额:￥2000
-            </div>
-          </div>
+          <div class="mask"></div>
+          <UserProfile
+            ref="userProfileComponentRef"
+            v-model:recogized="recognized"
+          />
         </div>
-        <div class="total">总记<span>￥52</span></div>
+        <div class="total">
+          总记<span>￥{{ total }}</span>
+        </div>
+
         <div class="footer">
-          <div class="order_status">支付状态<span>未支付</span></div>
-          <div class="exit" @click="exit">退出</div>
+          <div
+            class="face_recognize"
+            v-show="footerVisiable"
+            @click="facialPayment"
+          >
+            人脸支付
+          </div>
+          <div class="exit" v-show="footerVisiable" @click="exit">退出</div>
         </div>
       </div>
     </div>
@@ -40,9 +43,22 @@
 import { onMounted, ref } from "vue";
 import DishTable from "./DishTable.vue";
 import Banner from "./Banner.vue";
-import { Phone, User, Wallet } from "@element-plus/icons-vue";
+
+import UserProfile from "./UserProfile.vue";
+import router from "@/router";
+import { ElMessage } from "element-plus";
+// 为子组件引用添加类型声明
+interface ChildComponentInstance {
+  clear: () => void;
+}
+const paySpin = ref(false);
+const total = ref<number>(0);
+const flag = ref<boolean>(false);
 const videoElement = ref<HTMLVideoElement>();
 const start = ref<HTMLButtonElement>();
+const recognized = ref<boolean>(false);
+const promtText = ref<string>("正在支付，请稍候...");
+const userProfileComponentRef = ref<ChildComponentInstance | null>(null);
 let pc: any = null;
 let videoStream = null;
 const exit = () => {
@@ -127,7 +143,25 @@ const publish = async () => {
       }
     });
 };
-
+const footerVisiable = ref<boolean>(true);
+const facialPayment = () => {
+  if (recognized.value === false) {
+    ElMessage({
+      message: "请先识别您的身份！！",
+      type: "warning",
+    });
+    return;
+  } else {
+    paySpin.value = true;
+    setTimeout(() => {
+      paySpin.value = false;
+      ElMessage({
+        message: "支付成功",
+        type: "success",
+      });
+    }, 2000);
+  }
+};
 const httpApi = async (url: string, data: any) => {
   try {
     const response = await fetch(url, {
@@ -146,20 +180,7 @@ const httpApi = async (url: string, data: any) => {
     return null;
   }
 };
-interface ISentence {
-  commit_from: string;
-  created_at: string;
-  creator: string;
-  creator_uid: number;
-  from: string;
-  from_who: string;
-  hitokoto: string;
-  id: number;
-  length: number;
-  reviewer: number;
-  type: string;
-  uuid: string;
-}
+
 onMounted(() => {
   publish();
 });
@@ -221,12 +242,13 @@ h1 {
   padding: 20px;
   width: 30vw;
   min-height: 500px;
-  min-width:250px;
+  min-width: 250px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   color: var(--color-font-light);
   .usercard {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -241,17 +263,12 @@ h1 {
       border-radius: var(--border-radius-round);
       background-color: var(--color-bg);
     }
-    .info {
-      width: 100%;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      margin-top: 32px;
-      flex-wrap: wrap;
-      .rest {
-        display: flex;
-        align-items: center;
-      }
+    .mask {
+      width: 150px;
+      height: 150px;
+      top: 10px;
+      border-radius: var(--border-radius-round);
+      position: absolute;
     }
   }
   .total {
@@ -275,7 +292,9 @@ h1 {
     height: 120px;
     font-weight: bold;
     font-size: 24px;
-    .order_status {
+    .confirm-order,
+    .face_recognize {
+      cursor: pointer;
       box-shadow: 10px 10px 50px -7px var(--color-dark);
       background-color: var(--color-bg-7);
       height: 100%;
@@ -287,11 +306,7 @@ h1 {
       align-items: center;
       flex-direction: column;
       font-size: 16px;
-      font-weight: normal;
-      span {
-        font-weight: bold;
-        font-size: 24px;
-      }
+      font-weight: bold;
     }
     .exit {
       box-shadow: 10px 10px 50px -7px var(--color-dark);
@@ -304,6 +319,8 @@ h1 {
       justify-content: center;
       align-items: center;
     }
+    .confirm-order:hover,
+    .face_recognize:hover,
     .exit:hover {
       background-color: var(--color-primary);
       transition: background-color 0.3s;
