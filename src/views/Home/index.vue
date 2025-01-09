@@ -1,24 +1,29 @@
 <template>
   <div class="box">
     <div class="title" style="height: 100px"></div>
+
     <div class="container">
       <div class="left">
         <div class="banner">
           <Banner />
         </div>
-        <div class="divid"></div>
+        <el-divider direction="vertical" style="height: 100%" />
         <div class="order">
           <DishTable v-model:total="total" />
         </div>
       </div>
+
       <div
         class="right"
         v-loading="paySpin"
         :element-loading-text="promtText"
         v-show="!showPayStatus"
       >
+        <el-divider>请将人脸对准摄像头进行识别</el-divider>
         <div class="usercard">
           <video ref="videoElement" autoplay></video>
+          <el-divider direction="vertical" style="height: 100%" />
+
           <UserProfile
             ref="userProfileComponentRef"
             v-model:recogized="recognized"
@@ -40,6 +45,7 @@
             人脸支付
           </div>
         </div>
+        <el-divider />
       </div>
       <div class="right" v-show="showPayStatus">
         <PayStatus v-model:time-to-back="timeToBack" />
@@ -212,10 +218,10 @@ h1 {
   font-family: "宋体";
 }
 .box {
-  background-image: url("../../assets/bg/bg01.png"),
-    url("../../assets/bg/bg02.png"), url("../../assets/bg/title.png");
-  background-size: 300px, 100px, 700px;
-  background-position: left bottom, right 0, center 20px;
+  background-image: url("../../assets/bg/bg02.png"),
+    url("../../assets/bg/title.png");
+  background-size: 100px, 700px;
+  background-position: right 0, center 20px;
   background-repeat: no-repeat;
 }
 .container {
@@ -261,7 +267,6 @@ h1 {
     color: black;
   }
   .usercard {
-    box-shadow: 10px 10px 50px -7px var(--color-dark);
     border: var(--border-size-sm) var(--color-dark) solid;
     display: flex;
     background-color: var(--color-bg-7);

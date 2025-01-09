@@ -1,21 +1,25 @@
 <template>
   <div class="banner">
-    <div class="ad">广告位招租</div>
-    <el-carousel
-      :height="bannerHeight"
-      direction="vertical"
-      motion-blur
-      :autoplay="false"
-    >
+    <el-carousel direction="vertical" motion-blur :autoplay="false">
       <el-carousel-item v-for="item in bannerDatas" :key="item">
         <img :src="item.url" alt="food-descript" />
       </el-carousel-item>
     </el-carousel>
   </div>
+  <el-divider />
+  <el-steps finish-status="success">
+    <el-step title="将餐盘放置到智能识别台进行识别" />
+    <el-step title="识别无误后，请进行人脸识别" />
+    <el-step title="点击人脸支付进行付款" />
+  </el-steps>
+  <el-divider />
+  <el-text>祝您用餐愉快</el-text>
+  <el-divider />
+  <el-text>广告位招租</el-text>
+  <el-divider />
 </template>
 
 <script setup lang="ts">
-const bannerHeight = "400px";
 const bannerDatas = [
   {
     name: "嘉兴肉粽",
@@ -65,42 +69,10 @@ const bannerDatas = [
 .el-carousel__item img {
   width: 100%;
 }
-.banner {
-  position: relative;
-}
-.ad {
-  position: absolute;
-  z-index: 1000;
-  font-size: 50px;
-  color: white;
-  font-weight: bold;
-  text-align: center;
-  background: -webkit-linear-gradient(left, #0f0, #00f) 0 0 no-repeat; /*设置线性渐变*/
-  background-size: 120px; /*设置背景大小*/
-  -webkit-background-size: 120px; /*设置背景大小*/
-  background-clip: text; /*背景被裁剪到文字*/
-  -webkit-background-clip: text; /*背景被裁剪到文字*/
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.3); /*设置文字的填充颜色*/
-  animation: shine 3s infinite; /*设置动画*/
-  -webkit-animation: shine 3s infinite; /*设置动画*/
-}
-@keyframes shine {
-  /*创建动画*/
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 100% 100%;
-  }
-}
-
-@-webkit-keyframes shine {
-  /*创建动画*/
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 100% 100%;
-  }
+::v-deep(.el-step__icon.is-text),
+::v-deep(.el-step__title.is-process) {
+  color: #a8abb2;
+  border-color: #a8abb2;
+  font-weight: normal;
 }
 </style>

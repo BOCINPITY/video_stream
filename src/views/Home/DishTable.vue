@@ -35,9 +35,9 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-empty v-if="!receivedData.length"  :image-size="200">
+    <el-empty v-if="!receivedData.length" :image-size="400" image="https://cdn.pixabay.com/photo/2014/04/03/10/09/place-setting-309980_640.png">
       <template #description>
-        <el-text size="large" type="primary"
+        <el-text style="font-size: 18px;" type="info"
           >请把餐盘放置到智能识别台进行识别!</el-text
         >
       </template>
