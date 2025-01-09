@@ -1,7 +1,7 @@
 <template>
   <div class="box">
-    <h1>餐厅智能自助结算系统</h1>
-    <div class="container" v-loading="flag" :element-loading-text="promtText">
+    <div class="title" style="height: 100px"></div>
+    <div class="container">
       <div class="left">
         <div class="banner">
           <Banner />
@@ -11,29 +11,38 @@
           <DishTable v-model:total="total" />
         </div>
       </div>
-      <div class="right" v-loading="paySpin" :element-loading-text="promtText">
+      <div
+        class="right"
+        v-loading="paySpin"
+        :element-loading-text="promtText"
+        v-show="!showPayStatus"
+      >
         <div class="usercard">
           <video ref="videoElement" autoplay></video>
-          <div class="mask"></div>
           <UserProfile
             ref="userProfileComponentRef"
             v-model:recogized="recognized"
           />
         </div>
+        <el-divider />
         <div class="total">
-          总记<span>￥{{ total }}</span>
+          <el-text>总计</el-text>
+          <span>￥{{ total }}</span>
         </div>
-
+        <el-divider />
         <div class="footer">
           <div
             class="face_recognize"
             v-show="footerVisiable"
             @click="facialPayment"
           >
+            <el-icon size="24" style="padding: 10px"><FullScreen /></el-icon>
             人脸支付
           </div>
-          <div class="exit" v-show="footerVisiable" @click="exit">退出</div>
         </div>
+      </div>
+      <div class="right" v-show="showPayStatus">
+        <PayStatus v-model:time-to-back="timeToBack" />
       </div>
     </div>
   </div>
@@ -43,17 +52,18 @@
 import { onMounted, ref } from "vue";
 import DishTable from "./DishTable.vue";
 import Banner from "./Banner.vue";
-
 import UserProfile from "./UserProfile.vue";
-import router from "@/router";
+import PayStatus from "@/components/PayStatus/index.vue";
 import { ElMessage } from "element-plus";
+import { FullScreen } from "@element-plus/icons-vue";
 // 为子组件引用添加类型声明
 interface ChildComponentInstance {
   clear: () => void;
 }
 const paySpin = ref(false);
+const timeToBack = ref(5);
+const showPayStatus = ref(false);
 const total = ref<number>(0);
-const flag = ref<boolean>(false);
 const videoElement = ref<HTMLVideoElement>();
 const start = ref<HTMLButtonElement>();
 const recognized = ref<boolean>(false);
@@ -61,9 +71,6 @@ const promtText = ref<string>("正在支付，请稍候...");
 const userProfileComponentRef = ref<ChildComponentInstance | null>(null);
 let pc: any = null;
 let videoStream = null;
-const exit = () => {
-  console.log("exit");
-};
 
 const publish = async () => {
   if (pc !== null && pc !== undefined) {
@@ -145,7 +152,7 @@ const publish = async () => {
 };
 const footerVisiable = ref<boolean>(true);
 const facialPayment = () => {
-  if (recognized.value === false) {
+  if (recognized.value) {
     ElMessage({
       message: "请先识别您的身份！！",
       type: "warning",
@@ -155,6 +162,10 @@ const facialPayment = () => {
     paySpin.value = true;
     setTimeout(() => {
       paySpin.value = false;
+      showPayStatus.value = true;
+      setTimeout(() => {
+        showPayStatus.value = false;
+      }, timeToBack.value * 1000);
       ElMessage({
         message: "支付成功",
         type: "success",
@@ -202,9 +213,9 @@ h1 {
 }
 .box {
   background-image: url("../../assets/bg/bg01.png"),
-    url("../../assets/bg/bg02.png");
-  background-size: 300px, 500px;
-  background-position: left bottom, right 0;
+    url("../../assets/bg/bg02.png"), url("../../assets/bg/title.png");
+  background-size: 300px, 100px, 700px;
+  background-position: left bottom, right 0, center 20px;
   background-repeat: no-repeat;
 }
 .container {
@@ -221,7 +232,7 @@ h1 {
   padding: 20px;
   flex: 1;
   border-radius: var(--border-radius-sm);
-  border: 2px var(--color-dark) solid;
+  border: var(--border-size-mid) var(--color-dark) solid;
   display: flex;
   .banner {
     border-radius: 8px;
@@ -237,7 +248,7 @@ h1 {
 .right {
   border-radius: var(--border-radius-sm);
   box-shadow: 10px 10px 50px -7px var(--color-dark);
-  border: 2px var(--color-dark) solid;
+  border: var(--border-size-mid) var(--color-dark) solid;
   margin: 20px;
   padding: 20px;
   width: 30vw;
@@ -245,14 +256,14 @@ h1 {
   min-width: 250px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  color: var(--color-font-light);
+  color: var(--color-font-dark);
+  h3 {
+    color: black;
+  }
   .usercard {
-    position: relative;
+    box-shadow: 10px 10px 50px -7px var(--color-dark);
+    border: var(--border-size-sm) var(--color-dark) solid;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     background-color: var(--color-bg-7);
     padding: 10px;
     border-radius: var(--border-radius-mid);
@@ -262,16 +273,12 @@ h1 {
       height: 150px;
       border-radius: var(--border-radius-round);
       background-color: var(--color-bg);
-    }
-    .mask {
-      width: 150px;
-      height: 150px;
-      top: 10px;
-      border-radius: var(--border-radius-round);
-      position: absolute;
+      border: var(--border-size-sm) var(--color-dark) solid;
+      margin-right: 100px;
     }
   }
   .total {
+    border: var(--border-size-sm) var(--color-dark) solid;
     box-shadow: 10px 10px 50px -7px var(--color-dark);
     background-color: var(--color-bg-7);
     height: 120px;
@@ -281,7 +288,7 @@ h1 {
     align-items: center;
     border-radius: var(--border-radius-mid);
     span {
-      font-size: 24px;
+      font-size: 18px;
     }
   }
   .footer {
@@ -292,8 +299,9 @@ h1 {
     height: 120px;
     font-weight: bold;
     font-size: 24px;
-    .confirm-order,
+
     .face_recognize {
+      border: var(--border-size-sm) var(--color-dark) solid;
       cursor: pointer;
       box-shadow: 10px 10px 50px -7px var(--color-dark);
       background-color: var(--color-bg-7);
@@ -304,25 +312,12 @@ h1 {
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
       font-size: 16px;
       font-weight: bold;
     }
-    .exit {
-      box-shadow: 10px 10px 50px -7px var(--color-dark);
-      cursor: pointer;
-      background-color: var(--color-bg-7);
-      height: 100%;
-      width: 100%;
-      border-radius: var(--border-radius-mid);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .confirm-order:hover,
-    .face_recognize:hover,
-    .exit:hover {
-      background-color: var(--color-primary);
+
+    .face_recognize:hover {
+      background-color: #e9e9e9;
       transition: background-color 0.3s;
     }
   }

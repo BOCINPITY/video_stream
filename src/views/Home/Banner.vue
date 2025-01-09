@@ -1,5 +1,6 @@
 <template>
   <div class="banner">
+    <div class="ad">广告位招租</div>
     <el-carousel
       :height="bannerHeight"
       direction="vertical"
@@ -7,9 +8,6 @@
       :autoplay="false"
     >
       <el-carousel-item v-for="item in bannerDatas" :key="item">
-        <div>
-          <span>热销菜品:</span>{{ item.name }}<span>{{ item.price }}</span>
-        </div>
         <img :src="item.url" alt="food-descript" />
       </el-carousel-item>
     </el-carousel>
@@ -17,16 +15,16 @@
 </template>
 
 <script setup lang="ts">
-const bannerHeight = "600px";
+const bannerHeight = "400px";
 const bannerDatas = [
   {
     name: "嘉兴肉粽",
-    url: "https://cdn.pixabay.com/photo/2021/01/21/06/41/rice-dumplings-5936416_960_720.jpg",
+    url: "https://cdn.pixabay.com/photo/2018/10/25/19/15/goulash-3773134_640.jpg",
     price: "15元",
   },
   {
-    name: "飘香鸡腿",
-    url: "https://cdn.pixabay.com/photo/2017/06/26/13/58/chicken-2443901_960_720.jpg",
+    name: "猪肘",
+    url: "https://cdn.pixabay.com/photo/2011/04/29/11/20/spaghetti-7113_640.jpg",
     price: "18元",
   },
   {
@@ -36,7 +34,7 @@ const bannerDatas = [
   },
   {
     name: "小龙虾",
-    url: "https://cdn.pixabay.com/photo/2019/06/11/03/59/seafood-4265994_960_720.jpg",
+    url: "https://cdn.pixabay.com/photo/2024/12/29/01/58/couscous-9297173_640.jpg",
     price: "45元",
   },
   {
@@ -66,5 +64,43 @@ const bannerDatas = [
 }
 .el-carousel__item img {
   width: 100%;
+}
+.banner {
+  position: relative;
+}
+.ad {
+  position: absolute;
+  z-index: 1000;
+  font-size: 50px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  background: -webkit-linear-gradient(left, #0f0, #00f) 0 0 no-repeat; /*设置线性渐变*/
+  background-size: 120px; /*设置背景大小*/
+  -webkit-background-size: 120px; /*设置背景大小*/
+  background-clip: text; /*背景被裁剪到文字*/
+  -webkit-background-clip: text; /*背景被裁剪到文字*/
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.3); /*设置文字的填充颜色*/
+  animation: shine 3s infinite; /*设置动画*/
+  -webkit-animation: shine 3s infinite; /*设置动画*/
+}
+@keyframes shine {
+  /*创建动画*/
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+@-webkit-keyframes shine {
+  /*创建动画*/
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
 }
 </style>

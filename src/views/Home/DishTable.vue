@@ -1,12 +1,15 @@
 <template>
   <div>
-    <el-table :data="receivedData" style="width: 100%">
+    <el-table
+      :data="receivedData"
+      style="width: 100%"
+      v-if="receivedData.length"
+    >
       <el-table-column prop="name" label="识别图片" width="180">
         <template #default="scope">
           <img
             :style="{ height: 100 + 'px', borderRadius: 16 + 'px' }"
-            :src="scope.row.image"
-            :alt="scope.row.dish_info.name"
+            :src="scope.row.dish_info.resource"
           />
         </template>
       </el-table-column>
@@ -32,6 +35,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-empty v-if="!receivedData.length"  :image-size="200">
+      <template #description>
+        <el-text size="large" type="primary"
+          >请把餐盘放置到智能识别台进行识别!</el-text
+        >
+      </template>
+    </el-empty>
   </div>
 </template>
 
@@ -40,13 +50,14 @@ import { ref } from "vue";
 const props = defineProps<{
   total: number;
 }>();
-const tableVisiable = ref<boolean>(true)
+const tableVisiable = ref<boolean>(true);
 const emit = defineEmits<(e: "update:total", value: number) => void>();
 interface IDish {
   id: number;
   name: string;
   cname: string;
   price: number;
+  resource: string;
 }
 interface IDishInfo {
   dish_info: IDish;
@@ -62,7 +73,7 @@ socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     receivedData.value = data;
     // console.log("Received data:", receivedData.value);
-    computeTotal()
+    computeTotal();
   } catch (error) {
     console.error("菜品数据解析错误", error);
   }

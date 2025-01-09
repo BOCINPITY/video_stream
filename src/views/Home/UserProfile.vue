@@ -1,13 +1,31 @@
 <template>
   <div class="info">
     <div class="username">
-      <el-icon><User /></el-icon>{{ receivedData?.name }}
+      <el-icon style="padding-right: 10px;" :size="iconSize"
+        ><User /></el-icon
+      ><el-text size="large"
+        >尊贵的{{
+          receivedData?.name ? receivedData?.name : "unkown"
+        }}用户</el-text
+      >
     </div>
     <div class="phone">
-      <el-icon><Phone /></el-icon>电话:{{ receivedData?.phone_number }}
+      <el-icon style="padding-right: 10px;" :size="iconSize"
+        ><Phone /></el-icon
+      ><el-text size="large"
+        >电话:{{
+          receivedData?.phone_number ? receivedData?.phone_number : "unkown"
+        }}</el-text
+      >
     </div>
     <div class="account">
-      <el-icon><Wallet /></el-icon>余额:￥{{ receivedData?.account }}
+      <el-icon style="padding-right: 10px;" :size="iconSize"
+        ><Wallet /></el-icon
+      ><el-text size="large"
+        >余额:￥{{
+          receivedData?.account ? receivedData?.account : "unkown"
+        }}</el-text
+      >
     </div>
   </div>
 </template>
@@ -16,13 +34,12 @@
 import { Phone, User, Wallet } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { ref, watchEffect } from "vue";
-
+const iconSize = 20;
 const props = defineProps<{
   recogized: boolean;
 }>();
 
-const emit =
-  defineEmits<(e: "update:recogized", value: boolean) => void>();
+const emit = defineEmits<(e: "update:recogized", value: boolean) => void>();
 interface IUser {
   id: number;
   name: string;
@@ -51,7 +68,7 @@ socket.onmessage = function (event) {
     const data = JSON.parse(event.data);
     receivedData.value = data;
     console.log("Received data:", receivedData.value);
-    emit("update:recogized",true)
+    emit("update:recogized", true);
   } catch (error) {
     console.error("数据解析错误:", error);
   }
@@ -81,14 +98,15 @@ defineExpose({
 <style scoped>
 .info {
   width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: space-around;
-  align-items: center;
-  margin-top: 32px;
   flex-wrap: wrap;
+  .username,
+  .phone,
   .account {
     display: flex;
-    align-items: center;
   }
 }
 </style>
