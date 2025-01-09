@@ -41,7 +41,7 @@ const clear = () => {
   };
 };
 
-socket = new WebSocket("ws://localhost:8087");
+socket = new WebSocket("ws://192.168.1.102:8087");
 socket.onopen = function () {
   console.log("Connected to the server");
 };
@@ -53,12 +53,12 @@ socket.onmessage = function (event) {
     console.log("Received data:", receivedData.value);
     emit("update:recogized",true)
   } catch (error) {
-    console.error("Error parsing data:", error);
+    console.error("数据解析错误:", error);
   }
 };
 
 socket.onclose = function () {
-  console.log("Disconnected from the server");
+  console.error("人脸识别服务已断开");
   socket = null;
 };
 

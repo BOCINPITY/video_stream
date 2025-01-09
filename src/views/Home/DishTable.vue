@@ -61,15 +61,15 @@ socket.onmessage = function (event) {
   try {
     const data = JSON.parse(event.data);
     receivedData.value = data;
-    console.log("Received data:", receivedData.value);
+    // console.log("Received data:", receivedData.value);
     computeTotal()
   } catch (error) {
-    console.error("Error parsing data:", error);
+    console.error("菜品数据解析错误", error);
   }
 };
 
 socket.onclose = function () {
-  console.log("Disconnected from the server");
+  console.error("菜品识别服务已断开");
 };
 
 socket.onerror = function (error) {
@@ -81,7 +81,6 @@ const computeTotal = () => {
   receivedData.value.forEach((item) => {
     sum += item.dish_info.price * item.number;
   });
-  console.log(sum)
   emit("update:total", sum);
 };
 </script>
