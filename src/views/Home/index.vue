@@ -204,24 +204,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
-h1 {
-  text-align: center;
-  letter-spacing: 2rem;
-  -webkit-text-stroke: 1px var(--color-font-dark);
-  -webkit-text-fill-color: transparent;
-  font-weight: bold;
-  font-size: 42px;
-}
-.sentence {
-  text-align: center;
-  color: #bbb;
-  font-family: "宋体";
-}
 .box {
-  background-image: url("../../assets/bg/bg02.png"),
-    url("../../assets/bg/title.png");
-  background-size: 100px, 700px;
-  background-position: right 0, center 20px;
+  background-image: url("../../assets/bg/title.png");
+  background-size: 650px;
+  background-position: center 20px;
   background-repeat: no-repeat;
 }
 .container {
@@ -244,9 +230,6 @@ h1 {
     border-radius: 8px;
     flex: 0.4;
   }
-  .divid {
-    width: 20px;
-  }
   .order {
     flex: 0.6;
   }
@@ -263,9 +246,6 @@ h1 {
   display: flex;
   flex-direction: column;
   color: var(--color-font-dark);
-  h3 {
-    color: black;
-  }
   .usercard {
     border: var(--border-size-sm) var(--color-dark) solid;
     display: flex;
