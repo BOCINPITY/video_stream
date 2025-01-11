@@ -50,7 +50,7 @@
         </div>
         <el-divider />
       </div>
-      <div class="right" v-show="showPayStatus">
+      <div class="right" v-show="true">
         <PayStatus
           :time-to-back="timeToBack"
           :phone="orderPayResponeData?.phone"
@@ -58,6 +58,7 @@
           :details="orderPayResponeData?.orderdetails"
           :status="orderPayResponeData?.payStatus"
           :total="orderPayResponeData?.totalPrice"
+          :username="orderPayResponeData?.name"
         />
       </div>
     </div>
@@ -73,6 +74,7 @@ import PayStatus from "@/components/PayStatus/index.vue";
 import { FullScreen, UserFilled } from "@element-plus/icons-vue";
 import type { OrderItem, orderDetail } from "@/types";
 import { ElMessage } from "element-plus";
+import { RTC, httpLocal, baseUrl } from "@/config.ts";
 // 为子组件引用添加类型声明
 interface UserProfileInstance {
   clear: () => void;
@@ -129,8 +131,8 @@ const publish = async () => {
   } catch (error) {
     console.error("获取媒体流失败", error);
   }
-  const httpURL = "http://localhost:1985/rtc/v1/publish/";
-  const webRTCURL = "webRTC://localhost/live/livestream";
+  const httpURL = `${httpLocal}:1985/rtc/v1/publish/`;
+  const webRTCURL = `${RTC}/live/livestream`;
 
   // 通过摄像头、麦克风获取音视频流
   videoStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -197,6 +199,7 @@ interface orderPayRespone {
   orderdetails: orderDetail[];
   totalPrice: number;
   payStatus: boolean;
+  name: string;
 }
 const orderPayResponeData = ref<orderPayRespone | null>();
 watch(
@@ -209,10 +212,7 @@ watch(
       };
 
       try {
-        const res = await httpApi(
-          "http://192.168.252.191:8089/api/orderPay",
-          paymentData
-        );
+        const res = await httpApi(`${baseUrl}:8089/api/orderPay`, paymentData);
         orderPayResponeData.value = res;
         console.log(orderPayResponeData.value);
         paySpin.value = false;

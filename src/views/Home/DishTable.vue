@@ -73,11 +73,12 @@ const handleCLickConfirmOrder = () => {
   });
 };
 import type { IDishInfo, OrderItem } from "@/types";
+import {dishSocket} from "@/config.ts";
 const tableVisiable = ref<boolean>(true);
 const emit = defineEmits<(e: "update:total", value: number) => void>();
 
 const receivedData = ref<IDishInfo[]>([]);
-const socket = new WebSocket("ws://localhost:8765");
+const socket = new WebSocket(dishSocket);
 socket.onopen = function () {
   console.log("Connected to the server");
 };

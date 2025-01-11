@@ -2,7 +2,13 @@
   <div class="pay-container">
     <div class="pay-list-item">
       <el-text size="large"
-        ><el-icon><User /></el-icon>支付账号:{{ props.phone }}</el-text
+        ><el-icon><CollectionTag /></el-icon>支付账号:{{ props.phone }}</el-text
+      >
+    </div>
+    <el-divider />
+    <div class="pay-list-item">
+      <el-text size="large"
+        ><el-icon><User /></el-icon>用户:{{ props.username }}</el-text
       >
     </div>
     <el-divider />
@@ -60,11 +66,12 @@ import {
   Bowl,
   Warning,
   Document,
+  CollectionTag,
 } from "@element-plus/icons-vue";
 import type { orderDetail } from "@/types";
 const props = defineProps<{
   phone?: string;
-  name?: string;
+  username?: string;
   orderId?: string;
   details?: orderDetail[];
   total?: number;

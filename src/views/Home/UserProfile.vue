@@ -31,6 +31,7 @@
 import { Phone, User, Wallet } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import { ref } from "vue";
+import { faceSocket } from "@/config.ts";
 const iconSize = 20;
 const props = defineProps<{
   recogized: boolean;
@@ -62,7 +63,7 @@ const sendDataToSocket = (data: number) => {
   }
 };
 
-socket = new WebSocket("ws://192.168.252.191:8087");
+socket = new WebSocket(faceSocket);
 socket.onopen = function () {
   console.log("Connected to the server");
 };
