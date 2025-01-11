@@ -35,9 +35,20 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-empty v-if="!receivedData.length" :image-size="400" image="https://cdn.pixabay.com/photo/2014/04/03/10/09/place-setting-309980_640.png">
+    <el-button
+      style="margin-top: 20px; width: 100%"
+      type="primary"
+      v-if="receivedData.length"
+      @click="handleCLickConfirmOrder"
+      >确认订单</el-button
+    >
+    <el-empty
+      v-if="!receivedData.length"
+      :image-size="400"
+      image="https://cdn.pixabay.com/photo/2014/04/03/10/09/place-setting-309980_640.png"
+    >
       <template #description>
-        <el-text style="font-size: 18px;" type="info"
+        <el-text style="font-size: 18px" type="info"
           >请把餐盘放置到智能识别台进行识别!</el-text
         >
       </template>
@@ -50,19 +61,21 @@ import { ref } from "vue";
 const props = defineProps<{
   total: number;
 }>();
+let orderDataSnap: OrderItem[] = []; //订单快照
+const handleCLickConfirmOrder = () => {
+  orderDataSnap = [];
+  receivedData.value.map((item) => {
+    orderDataSnap.push({
+      id: item.dish_info.id,
+      price: item.dish_info.price,
+      num: item.number,
+    });
+  });
+};
+import type { IDishInfo, OrderItem } from "@/types";
 const tableVisiable = ref<boolean>(true);
 const emit = defineEmits<(e: "update:total", value: number) => void>();
-interface IDish {
-  id: number;
-  name: string;
-  cname: string;
-  price: number;
-  resource: string;
-}
-interface IDishInfo {
-  dish_info: IDish;
-  number: number;
-}
+
 const receivedData = ref<IDishInfo[]>([]);
 const socket = new WebSocket("ws://localhost:8765");
 socket.onopen = function () {
@@ -94,6 +107,16 @@ const computeTotal = () => {
   });
   emit("update:total", sum);
 };
+const clear = () => {
+  receivedData.value = [];
+  orderDataSnap = [];
+};
+
+const getOrder = () => orderDataSnap;
+defineExpose({
+  clear,
+  getOrder,
+});
 </script>
 
 <style scoped></style>

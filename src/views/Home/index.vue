@@ -9,7 +9,7 @@
         </div>
         <el-divider direction="vertical" style="height: 100%" />
         <div class="order">
-          <DishTable v-model:total="total" />
+          <DishTable v-model:total="total" ref="dishTableComponentRef" />
         </div>
       </div>
 
@@ -22,6 +22,9 @@
         <el-divider>请将人脸对准摄像头进行识别</el-divider>
         <div class="usercard">
           <video ref="videoElement" autoplay></video>
+          <div class="mask" v-show="maskVisiable">
+            <el-icon size="70" style="padding: 10px"><UserFilled /></el-icon>
+          </div>
           <el-divider direction="vertical" style="height: 100%" />
 
           <UserProfile
@@ -48,24 +51,41 @@
         <el-divider />
       </div>
       <div class="right" v-show="showPayStatus">
-        <PayStatus v-model:time-to-back="timeToBack" />
+        <PayStatus
+          :time-to-back="timeToBack"
+          :phone="orderPayResponeData?.phone"
+          :order-id="orderPayResponeData?.orderId"
+          :details="orderPayResponeData?.orderdetails"
+          :status="orderPayResponeData?.payStatus"
+          :total="orderPayResponeData?.totalPrice"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import DishTable from "./DishTable.vue";
 import Banner from "./Banner.vue";
 import UserProfile from "./UserProfile.vue";
 import PayStatus from "@/components/PayStatus/index.vue";
+import { FullScreen, UserFilled } from "@element-plus/icons-vue";
+import type { OrderItem, orderDetail } from "@/types";
 import { ElMessage } from "element-plus";
-import { FullScreen } from "@element-plus/icons-vue";
 // 为子组件引用添加类型声明
-interface ChildComponentInstance {
+interface UserProfileInstance {
   clear: () => void;
+  sendDataToSocket: (data: number) => void;
+  getUserId: () => number;
 }
+
+interface DishTableInstance {
+  clear: () => void;
+  getOrder: () => OrderItem[];
+}
+
+const maskVisiable = ref(true);
 const paySpin = ref(false);
 const timeToBack = ref(5);
 const showPayStatus = ref(false);
@@ -74,7 +94,8 @@ const videoElement = ref<HTMLVideoElement>();
 const start = ref<HTMLButtonElement>();
 const recognized = ref<boolean>(false);
 const promtText = ref<string>("正在支付，请稍候...");
-const userProfileComponentRef = ref<ChildComponentInstance | null>(null);
+const userProfileComponentRef = ref<UserProfileInstance | null>(null);
+const dishTableComponentRef = ref<DishTableInstance | null>(null);
 let pc: any = null;
 let videoStream = null;
 
@@ -143,7 +164,7 @@ const publish = async () => {
   // SDP交换，请求SRS自带的信令服务器
   httpApi(httpURL, data)
     .then(async (data: any) => {
-      console.log("answer", data);
+      // console.log("answer", data);
       // 设置远端描述，开始连接
       await pc.setRemoteDescription(
         new RTCSessionDescription({ type: "answer", sdp: data.sdp })
@@ -157,28 +178,62 @@ const publish = async () => {
     });
 };
 const footerVisiable = ref<boolean>(true);
-const facialPayment = () => {
-  if (recognized.value) {
+const facialPayment = async () => {
+  if (dishTableComponentRef.value?.getOrder().length === 0) {
     ElMessage({
-      message: "请先识别您的身份！！",
+      message: "请先识别您餐盘中的菜品",
       type: "warning",
     });
     return;
-  } else {
-    paySpin.value = true;
-    setTimeout(() => {
-      paySpin.value = false;
-      showPayStatus.value = true;
-      setTimeout(() => {
-        showPayStatus.value = false;
-      }, timeToBack.value * 1000);
-      ElMessage({
-        message: "支付成功",
-        type: "success",
-      });
-    }, 2000);
   }
+  userProfileComponentRef.value?.sendDataToSocket(1);
+  paySpin.value = true;
+  maskVisiable.value = false;
 };
+
+interface orderPayRespone {
+  phone: string;
+  orderId: string;
+  orderdetails: orderDetail[];
+  totalPrice: number;
+  payStatus: boolean;
+}
+const orderPayResponeData = ref<orderPayRespone | null>();
+watch(
+  recognized,
+  async (newValue, oldValue) => {
+    if (newValue && !oldValue) {
+      const paymentData = {
+        userId: userProfileComponentRef.value?.getUserId(),
+        dishList: dishTableComponentRef.value?.getOrder(),
+      };
+
+      try {
+        const res = await httpApi(
+          "http://192.168.252.191:8089/api/orderPay",
+          paymentData
+        );
+        orderPayResponeData.value = res;
+        console.log(orderPayResponeData.value);
+        paySpin.value = false;
+        showPayStatus.value = true;
+        setTimeout(() => {
+          showPayStatus.value = false;
+          orderPayResponeData.value = null;
+          //清除数据
+          dishTableComponentRef.value?.clear();
+          userProfileComponentRef.value?.clear();
+          total.value = 0;
+          maskVisiable.value = true;
+          recognized.value = false;
+        }, timeToBack.value * 1000);
+      } catch (error) {
+        console.error("请求出错:", error);
+      }
+    }
+  },
+  { immediate: false, deep: true }
+);
 const httpApi = async (url: string, data: any) => {
   try {
     const response = await fetch(url, {
@@ -189,8 +244,8 @@ const httpApi = async (url: string, data: any) => {
       body: JSON.stringify(data),
     });
     const result = await response.json();
-    console.log("Request data sent to server:", data);
-    console.log("Raw response from server:", result);
+    // console.log("Request data sent to server:", data);
+    // console.log("Raw response from server:", result);
     return result;
   } catch (error) {
     console.error("Error in httpApi:", error);
@@ -252,6 +307,16 @@ onMounted(() => {
     background-color: var(--color-bg-7);
     padding: 10px;
     border-radius: var(--border-radius-mid);
+    .mask {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background-color: #d6d5d5;
+      border-radius: var(--border-radius-round);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     video {
       object-fit: cover;
       width: 150px;

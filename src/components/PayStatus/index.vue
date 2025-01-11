@@ -16,20 +16,17 @@
     <el-divider />
     <div class="pay-list-item">
       <div class="order-details">
-        <el-descriptions direction="vertical" :column="4" border>
-          <template #title>
-            <el-icon><Memo /></el-icon
-            ><el-text style="font-weight: normal; font-size: 16px"
-              >订单详情:</el-text
-            >
-          </template>
-          <el-descriptions-item label="菜品">西红柿炒鸡蛋</el-descriptions-item>
-          <el-descriptions-item label="单价/元">8</el-descriptions-item>
-          <el-descriptions-item label="数量">1</el-descriptions-item>
-        </el-descriptions>
+        <el-icon><Document /></el-icon>
+        <el-text size="large">订单详情</el-text>
+
+        <el-table :data="props.details" style="width: 100%" border>
+          <el-table-column prop="dishName" label="品类名" />
+          <el-table-column prop="price" label="单价/元" />
+          <el-table-column prop="num" label="数量" />
+        </el-table>
       </div>
+      <el-divider />
     </div>
-    <el-divider />
     <div class="pay-list-item">
       <el-icon><Bowl /></el-icon
       ><el-text size="large">总计:{{ props.total }}元</el-text>
@@ -42,7 +39,7 @@
         icon="success"
         title="支付成功，祝您用餐愉快"
         sub-title="5s后自动返回"
-        v-if="!props.status"
+        v-if="props.status"
       >
       </el-result>
       <el-result
@@ -60,16 +57,17 @@
 import {
   User,
   ShoppingTrolley,
-  Memo,
   Bowl,
   Warning,
+  Document,
 } from "@element-plus/icons-vue";
+import type { orderDetail } from "@/types";
 const props = defineProps<{
   phone?: string;
   name?: string;
   orderId?: string;
-  details?: object;
-  total?: string;
+  details?: orderDetail[];
+  total?: number;
   status?: boolean;
   timeToBack?: number;
 }>();
