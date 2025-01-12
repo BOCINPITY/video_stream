@@ -6,7 +6,7 @@ WORKDIR /app
 
 # 从远程仓库拉取代码
 RUN apk add --no-cache git && \
-    git clone https://github.com/BOCINPITY/dockertest.git . && \
+    git clone https://github.com/BOCINPITY/video_stream.git . && \
     npm install && \
     npm run build
 
