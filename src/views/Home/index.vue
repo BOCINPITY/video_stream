@@ -50,7 +50,7 @@
         </div>
         <el-divider />
       </div>
-      <div class="right" v-show="true">
+      <div class="right" v-show="showPayStatus">
         <PayStatus
           :time-to-back="timeToBack"
           :phone="orderPayResponeData?.phone"
@@ -117,7 +117,7 @@ const publish = async () => {
       autoGainControl: true, // 自动增益
     },
     video: {
-      frameRate: { min: 30 }, // 最小帧率
+      frameRate: { min: 30, max: 30 }, // 最小帧率
       width: { min: 640, ideal: 1080 }, // 宽度
       height: { min: 360, ideal: 720 }, // 高度
       aspectRatio: 16 / 9, // 宽高比
