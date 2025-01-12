@@ -212,7 +212,7 @@ watch(
       };
 
       try {
-        const res = await httpApi(`${baseUrl}:8089/api/orderPay`, paymentData);
+        const res = await httpApi(`${baseUrl}/api/orderPay`, paymentData);
         orderPayResponeData.value = res;
         console.log(orderPayResponeData.value);
         paySpin.value = false;
